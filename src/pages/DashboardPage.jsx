@@ -35,12 +35,12 @@ export function DashboardPage() {
   if (error) return <ErrorState message={error} />
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-semibold">Dashboard</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Total Events" value={stats.events} />
-        <StatCard label="My Registered Events" value={stats.registered} />
-        <StatCard label="My Attendance Count" value={stats.attendanceCount} />
+    <section className="mx-auto flex max-w-4xl flex-col gap-4 p-1">
+      <h2 className="px-1 text-xl font-semibold tracking-tight text-slate-900">Dashboard</h2>
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <StatCard label="Total events" value={stats.events} />
+        <StatCard label="My events (admin-assigned)" value={stats.registered} />
+        <StatCard label="Attendance check-ins" value={stats.attendanceCount} />
       </div>
     </section>
   )
@@ -48,9 +48,9 @@ export function DashboardPage() {
 
 function StatCard({ label, value }) {
   return (
-    <div className="rounded-xl border bg-white p-4">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
+      <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">{value}</p>
     </div>
   )
 }

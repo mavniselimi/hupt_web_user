@@ -55,19 +55,21 @@ export function AppShell() {
             </div>
           </header>
 
-          <main className="flex-1 p-4 pb-20 md:p-6 md:pb-6">
+          <main className="flex-1 p-4 pb-24 md:p-6 md:pb-6">
             <Outlet />
           </main>
 
-          <nav className="fixed bottom-0 left-0 right-0 border-t bg-white md:hidden">
-            <div className="grid grid-cols-5">
+          <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur md:hidden">
+            <div className="mx-auto grid max-w-lg grid-cols-5">
               {NAV_ITEMS.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.to === '/'}
                   className={({ isActive }) =>
-                    `px-1 py-2 text-center text-xs ${isActive ? 'font-semibold text-slate-900' : 'text-slate-500'}`
+                    `flex min-h-[52px] items-center justify-center px-1 py-2 text-center text-xs leading-tight ${
+                      isActive ? 'font-semibold text-slate-900' : 'text-slate-500'
+                    }`
                   }
                 >
                   {item.label}

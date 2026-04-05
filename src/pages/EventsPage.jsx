@@ -29,18 +29,18 @@ export function EventsPage() {
   if (!events.length) return <EmptyState message="No events found." />
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-semibold">Events</h2>
-      <div className="grid gap-4 md:grid-cols-2">
+    <section className="mx-auto flex max-w-4xl flex-col gap-4 p-1">
+      <h2 className="px-1 text-xl font-semibold tracking-tight text-slate-900">Events</h2>
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         {events.map((event) => (
           <Link
             key={event.id}
             to={`/events/${event.id}`}
-            className="rounded-xl border bg-white p-4 hover:border-slate-400"
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm active:border-slate-300 sm:p-5"
           >
-            <h3 className="font-semibold">{event.title}</h3>
-            <p className="mt-1 line-clamp-2 text-sm text-slate-500">{event.description}</p>
-            <p className="mt-3 text-xs text-slate-500">{formatDateTime(event.startTime)}</p>
+            <h3 className="font-semibold text-slate-900">{event.title}</h3>
+            <p className="mt-2 line-clamp-2 text-sm text-slate-600">{event.description}</p>
+            <p className="mt-4 text-xs text-slate-500">{formatDateTime(event.startTime)}</p>
           </Link>
         ))}
       </div>

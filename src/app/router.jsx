@@ -26,6 +26,7 @@ export const router = createBrowserRouter([
       { path: 'events/:eventId', element: <EventDetailPage /> },
       { path: 'sessions', element: <SessionsPage /> },
       { path: 'attendance', element: <AttendancePage /> },
+      { path: 'attendance/:sessionId', element: <AttendancePage /> },
       { path: 'profile', element: <ProfilePage /> },
     ],
     errorElement: <RouteErrorBoundary />,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { sessionsService } from '@/features/sessions/sessionsService'
 import { formatDateTime } from '@/utils/formatters'
 import { EmptyState, ErrorState, LoadingState } from '@/components/PageState'
@@ -28,22 +29,34 @@ export function SessionsPage() {
   if (!sessions.length) return <EmptyState message="No active sessions." />
 
   return (
-    <section className="space-y-4">
-      <h2 className="text-xl font-semibold">Active Sessions</h2>
-      <div className="grid gap-3">
+    <section className="mx-auto flex max-w-2xl flex-col gap-4 p-1">
+      <h2 className="px-1 text-xl font-semibold tracking-tight text-slate-900">Active sessions</h2>
+      <ul className="flex flex-col gap-3">
         {sessions.map((session) => (
-          <div key={session.id} className="rounded-xl border bg-white p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-semibold">{session.title}</h3>
-                <p className="mt-1 text-sm text-slate-500">{session.description}</p>
+          <li
+            key={session.id}
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-slate-900">{session.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-slate-600">{session.description}</p>
+                <p className="mt-3 text-xs text-slate-500">Starts: {formatDateTime(session.startTime)}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Speaker: <span className="font-medium text-slate-700">{session.speaker || 'TBA'}</span>
+                </p>
               </div>
-              <span className="rounded bg-slate-100 px-2 py-1 text-xs">{session.speaker || 'TBA'}</span>
+              <Link
+                to={`/attendance/${session.id}`}
+                state={{ sessionTitle: session.title }}
+                className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-medium text-white active:bg-slate-800"
+              >
+                Check in
+              </Link>
             </div>
-            <p className="mt-2 text-xs text-slate-500">Starts: {formatDateTime(session.startTime)}</p>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }

@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { eventsService } from '@/features/events/eventsService'
 import { sessionsService } from '@/features/sessions/sessionsService'
 import { formatDateTime } from '@/utils/formatters'
 import { EmptyState, ErrorState, LoadingState } from '@/components/PageState'
-import { useToast } from '@/hooks/useToast'
 
 export function EventDetailPage() {
   const { eventId } = useParams()
-  const toast = useToast()
   const [event, setEvent] = useState(null)
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -33,47 +31,65 @@ export function EventDetailPage() {
     load()
   }, [eventId])
 
-  const registerMe = async () => {
-    try {
-      await eventsService.registerMe(eventId)
-      toast.show('Registered to event.')
-    } catch {
-      toast.show('Could not register to event.', 'error')
-    }
-  }
-
   if (loading) return <LoadingState message="Loading event details..." />
   if (error) return <ErrorState message={error} />
   if (!event) return <EmptyState message="Event not found." />
 
   return (
-    <section className="space-y-4">
-      <div className="rounded-xl border bg-white p-4">
-        <h2 className="text-xl font-semibold">{event.title}</h2>
-        <p className="mt-2 text-sm text-slate-600">{event.description}</p>
-        <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
-          <p>Start: {formatDateTime(event.startTime)}</p>
-          <p>End: {formatDateTime(event.endTime)}</p>
-          <p>Location: {event.location || '-'}</p>
-          <p>Sessions: {event.sessionCount}</p>
-        </div>
-        <button onClick={registerMe} className="mt-4 rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">
-          Register me
-        </button>
+    <section className="mx-auto flex max-w-2xl flex-col gap-4 p-1">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900">{event.title}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">{event.description}</p>
+        <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Start</dt>
+            <dd className="mt-0.5">{formatDateTime(event.startTime)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">End</dt>
+            <dd className="mt-0.5">{formatDateTime(event.endTime)}</dd>
+          </div>
+          <div className="sm:col-span-2">
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Location</dt>
+            <dd className="mt-0.5">{event.location || '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">Sessions</dt>
+            <dd className="mt-0.5">{event.sessionCount}</dd>
+          </div>
+        </dl>
       </div>
 
       <div className="space-y-3">
-        <h3 className="font-semibold">Sessions</h3>
+        <h3 className="px-1 text-base font-semibold text-slate-900">Sessions</h3>
         {!sessions.length ? (
           <EmptyState message="No sessions for this event." />
         ) : (
-          sessions.map((session) => (
-            <div key={session.id} className="rounded-xl border bg-white p-4">
-              <p className="font-medium">{session.title}</p>
-              <p className="mt-1 text-sm text-slate-500">{session.speaker}</p>
-              <p className="mt-2 text-xs text-slate-500">{formatDateTime(session.startTime)}</p>
-            </div>
-          ))
+          <ul className="flex flex-col gap-3">
+            {sessions.map((session) => (
+              <li
+                key={session.id}
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-slate-900">{session.title}</p>
+                    {session.speaker ? (
+                      <p className="mt-1 text-sm text-slate-500">{session.speaker}</p>
+                    ) : null}
+                    <p className="mt-2 text-xs text-slate-500">{formatDateTime(session.startTime)}</p>
+                  </div>
+                  <Link
+                    to={`/attendance/${session.id}`}
+                    state={{ sessionTitle: session.title }}
+                    className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-medium text-white active:bg-slate-800"
+                  >
+                    Check in
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </section>
