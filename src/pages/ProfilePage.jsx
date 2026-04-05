@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { UserAvatar } from '@/components/UserAvatar'
 import { profileService } from '@/features/profile/profileService'
 import { useAuthStore } from '@/store/authStore'
 import { ErrorState, LoadingState } from '@/components/PageState'
@@ -33,18 +34,22 @@ export function ProfilePage() {
 
   return (
     <section className="mx-auto flex max-w-lg flex-col gap-4 p-1">
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-        <h2 className="text-xl font-semibold tracking-tight text-slate-900">My profile</h2>
-        <dl className="mt-6 space-y-4 text-sm">
-          <div className="flex flex-col gap-1 border-b border-slate-100 pb-4 sm:flex-row sm:justify-between sm:gap-4">
-            <dt className="text-slate-500">Name</dt>
-            <dd className="font-medium text-slate-900">{profile?.name}</dd>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="bg-gradient-to-br from-slate-100 to-slate-50 px-4 pb-8 pt-6 sm:px-6">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <UserAvatar size="lg" className="ring-4 ring-white shadow-md" />
+            <div>
+              <h2 className="text-xl font-semibold tracking-tight text-slate-900">{profile?.name}</h2>
+              <p className="mt-1 text-sm text-slate-600">{profile?.role}</p>
+            </div>
           </div>
-          <div className="flex flex-col gap-1 border-b border-slate-100 pb-4 sm:flex-row sm:justify-between sm:gap-4">
+        </div>
+        <dl className="space-y-0 px-4 py-4 text-sm sm:px-6">
+          <div className="flex flex-col gap-1 border-b border-slate-100 py-3 sm:flex-row sm:justify-between sm:gap-4">
             <dt className="text-slate-500">Email</dt>
             <dd className="break-all font-medium text-slate-900">{profile?.email}</dd>
           </div>
-          <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
+          <div className="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-4">
             <dt className="text-slate-500">Role</dt>
             <dd className="font-medium text-slate-900">{profile?.role}</dd>
           </div>
@@ -54,7 +59,7 @@ export function ProfilePage() {
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h3 className="text-center text-lg font-semibold text-slate-900">My QR Code</h3>
         <p className="mt-1 text-center text-sm text-slate-500">
-          Show this code to event staff for check-in
+          Show this code to staff for event check-in
         </p>
         <div className="mt-6 flex flex-col items-center justify-center gap-4">
           {qrValue ? (
@@ -62,7 +67,10 @@ export function ProfilePage() {
               <QRCodeSVG value={qrValue} size={220} level="M" includeMargin />
             </div>
           ) : (
-            <p className="text-center text-sm text-slate-500">User ID unavailable for QR code.</p>
+            <p className="text-center text-sm text-slate-500">
+              We couldn&apos;t build a check-in code because your user ID isn&apos;t available. Try signing
+              in again or contact support.
+            </p>
           )}
         </div>
       </div>

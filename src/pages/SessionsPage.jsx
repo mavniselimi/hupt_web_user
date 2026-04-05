@@ -47,11 +47,11 @@ export function SessionsPage() {
                 </p>
               </div>
               <Link
-                to={`/attendance/${session.id}`}
+                to={`/sessions/${session.id}`}
                 state={{ sessionTitle: session.title }}
                 className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-medium text-white active:bg-slate-800"
               >
-                Check in
+                Open session
               </Link>
             </div>
           </li>

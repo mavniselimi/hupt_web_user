@@ -6,6 +6,9 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { EventsPage } from '@/pages/EventsPage'
 import { EventDetailPage } from '@/pages/EventDetailPage'
 import { SessionsPage } from '@/pages/SessionsPage'
+import { SessionDetailPage } from '@/pages/SessionDetailPage'
+import { AskQuestionPage } from '@/pages/AskQuestionPage'
+import { ApprovedQuestionsPage } from '@/pages/ApprovedQuestionsPage'
 import { AttendancePage } from '@/pages/AttendancePage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
@@ -25,6 +28,9 @@ export const router = createBrowserRouter([
       { path: 'events', element: <EventsPage /> },
       { path: 'events/:eventId', element: <EventDetailPage /> },
       { path: 'sessions', element: <SessionsPage /> },
+      { path: 'sessions/:sessionId/ask', element: <AskQuestionPage /> },
+      { path: 'sessions/:sessionId/questions', element: <ApprovedQuestionsPage /> },
+      { path: 'sessions/:sessionId', element: <SessionDetailPage /> },
       { path: 'attendance', element: <AttendancePage /> },
       { path: 'attendance/:sessionId', element: <AttendancePage /> },
       { path: 'profile', element: <ProfilePage /> },
