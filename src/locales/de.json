@@ -1,0 +1,66 @@
+{
+  "login": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melden Sie sich in Ihrem Konto an",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "submitting": "Anmeldung läuft…",
+    "error": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten."
+  },
+  "home": {
+    "greeting": "Hallo, {{name}}",
+    "yourEvent": "Ihre Veranstaltung",
+    "yourEvents": "Ihre Veranstaltungen",
+    "enterEvent": "Zur Veranstaltung",
+    "noEvents": "Keine registrierten Veranstaltungen",
+    "noEventsSubtext": "Sie sind noch für keine Veranstaltung registriert. Kontaktieren Sie Ihren Veranstaltungsorganisator, falls dies unerwartet ist.",
+    "sessions": "Sitzungen",
+    "location": "Ort"
+  },
+  "event": {
+    "back": "← Zurück",
+    "sessions": "Sitzungen",
+    "start": "Beginn",
+    "end": "Ende",
+    "location": "Ort",
+    "noSessions": "Keine Sitzungen für diese Veranstaltung verfügbar.",
+    "checkIn": "Einchecken",
+    "active": "Jetzt live",
+    "upcoming": "Bevorstehend",
+    "ended": "Beendet",
+    "speaker": "Referent"
+  },
+  "checkin": {
+    "title": "Einchecken",
+    "backToEvent": "← Zurück zur Veranstaltung",
+    "scanQR": "QR-Code scannen",
+    "scanHint": "Richten Sie Ihre Kamera auf den QR-Code der Sitzung",
+    "requesting": "Kamerazugriff wird angefordert…",
+    "cameraActive": "Kamera aktiv — halten Sie den QR-Code still",
+    "cameraDenied": "Kamerazugriff wurde verweigert.",
+    "cameraUnsupported": "Live-Scanning wird in Ihrem Browser nicht unterstützt.",
+    "cameraError": "Kamera konnte nicht gestartet werden.",
+    "allowCamera": "Bitte erlauben Sie den Kamerazugriff und laden Sie die Seite neu, um den QR-Scanner zu verwenden.",
+    "useManual": "Verwenden Sie die manuelle Code-Eingabe unten.",
+    "divider": "oder Code manuell eingeben",
+    "codePlaceholder": "Anwesenheitscode",
+    "codeLabel": "Code eingeben",
+    "submit": "Anwesenheit bestätigen",
+    "submitting": "Wird gesendet…",
+    "successTitle": "Erfolgreich eingecheckt!",
+    "successSubtext": "Ihre Anwesenheit wurde erfasst.",
+    "backAfterSuccess": "Zurück zur Veranstaltung",
+    "error": "Einchecken fehlgeschlagen. Bitte überprüfen Sie den Code und versuchen Sie es erneut.",
+    "emptyCode": "Bitte geben Sie einen Anwesenheitscode ein."
+  },
+  "nav": {
+    "logout": "Abmelden"
+  },
+  "common": {
+    "loading": "Wird geladen…",
+    "error": "Etwas ist schiefgelaufen.",
+    "noData": "Keine Daten gefunden.",
+    "notFound": "Seite nicht gefunden."
+  }
+}

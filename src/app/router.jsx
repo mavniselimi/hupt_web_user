@@ -1,21 +1,19 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/layouts/AppShell'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { LoginPage } from '@/pages/LoginPage'
-import { DashboardPage } from '@/pages/DashboardPage'
-import { EventsPage } from '@/pages/EventsPage'
-import { EventDetailPage } from '@/pages/EventDetailPage'
-import { SessionsPage } from '@/pages/SessionsPage'
-import { SessionDetailPage } from '@/pages/SessionDetailPage'
-import { AskQuestionPage } from '@/pages/AskQuestionPage'
-import { ApprovedQuestionsPage } from '@/pages/ApprovedQuestionsPage'
-import { AttendancePage } from '@/pages/AttendancePage'
-import { ProfilePage } from '@/pages/ProfilePage'
-import { NotFoundPage } from '@/pages/NotFoundPage'
 import { RouteErrorBoundary } from '@/components/RouteErrorBoundary'
+import { LoginPage } from '@/pages/LoginPage'
+import { HomePage } from '@/pages/HomePage'
+import { EventDetailPage } from '@/pages/EventDetailPage'
+import { CheckInPage } from '@/pages/CheckInPage'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export const router = createBrowserRouter([
-  { path: '/login', element: <LoginPage />, errorElement: <RouteErrorBoundary /> },
+  {
+    path: '/login',
+    element: <LoginPage />,
+    errorElement: <RouteErrorBoundary />,
+  },
   {
     path: '/',
     element: (
@@ -23,20 +21,12 @@ export const router = createBrowserRouter([
         <AppShell />
       </ProtectedRoute>
     ),
-    children: [
-      { index: true, element: <DashboardPage /> },
-      { path: 'events', element: <EventsPage /> },
-      { path: 'events/:eventId', element: <EventDetailPage /> },
-      { path: 'sessions', element: <SessionsPage /> },
-      { path: 'sessions/:sessionId/ask', element: <AskQuestionPage /> },
-      { path: 'sessions/:sessionId/questions', element: <ApprovedQuestionsPage /> },
-      { path: 'sessions/:sessionId', element: <SessionDetailPage /> },
-      { path: 'attendance', element: <AttendancePage /> },
-      { path: 'attendance/:sessionId', element: <AttendancePage /> },
-      { path: 'profile', element: <ProfilePage /> },
-    ],
     errorElement: <RouteErrorBoundary />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: 'event/:eventId', element: <EventDetailPage /> },
+      { path: 'event/:eventId/session/:sessionId/check-in', element: <CheckInPage /> },
+    ],
   },
   { path: '*', element: <NotFoundPage />, errorElement: <RouteErrorBoundary /> },
-  { path: '/home', element: <Navigate to="/" replace /> },
 ])

@@ -1,0 +1,66 @@
+{
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "error": "Login failed. Please check your credentials."
+  },
+  "home": {
+    "greeting": "Hi, {{name}}",
+    "yourEvent": "Your Event",
+    "yourEvents": "Your Events",
+    "enterEvent": "Enter Event",
+    "noEvents": "No registered events",
+    "noEventsSubtext": "You have not been registered for any events yet. Contact your event organiser if this is unexpected.",
+    "sessions": "sessions",
+    "location": "Location"
+  },
+  "event": {
+    "back": "← Back",
+    "sessions": "Sessions",
+    "start": "Start",
+    "end": "End",
+    "location": "Location",
+    "noSessions": "No sessions available for this event.",
+    "checkIn": "Check In",
+    "active": "Live now",
+    "upcoming": "Upcoming",
+    "ended": "Ended",
+    "speaker": "Speaker"
+  },
+  "checkin": {
+    "title": "Check In",
+    "backToEvent": "← Back to Event",
+    "scanQR": "Scan QR Code",
+    "scanHint": "Point your camera at the session QR code",
+    "requesting": "Requesting camera access…",
+    "cameraActive": "Camera active — hold QR code steady",
+    "cameraDenied": "Camera access was denied.",
+    "cameraUnsupported": "Live scanning is not supported in your browser.",
+    "cameraError": "Could not start camera.",
+    "allowCamera": "Please allow camera access and reload to use the QR scanner.",
+    "useManual": "Use manual code entry below.",
+    "divider": "or enter code manually",
+    "codePlaceholder": "Attendance code",
+    "codeLabel": "Enter code",
+    "submit": "Submit Attendance",
+    "submitting": "Submitting…",
+    "successTitle": "You're checked in!",
+    "successSubtext": "Your attendance has been recorded.",
+    "backAfterSuccess": "Back to Event",
+    "error": "Check-in failed. Please check the code and try again.",
+    "emptyCode": "Please enter an attendance code."
+  },
+  "nav": {
+    "logout": "Logout"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "noData": "No data found.",
+    "notFound": "Page not found."
+  }
+}

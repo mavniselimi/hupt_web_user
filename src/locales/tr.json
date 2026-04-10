@@ -1,0 +1,66 @@
+{
+  "login": {
+    "title": "Tekrar hoş geldiniz",
+    "subtitle": "Hesabınıza giriş yapın",
+    "email": "E-posta adresi",
+    "password": "Şifre",
+    "submit": "Giriş yap",
+    "submitting": "Giriş yapılıyor…",
+    "error": "Giriş başarısız. Lütfen bilgilerinizi kontrol edin."
+  },
+  "home": {
+    "greeting": "Merhaba, {{name}}",
+    "yourEvent": "Etkinliğiniz",
+    "yourEvents": "Etkinlikleriniz",
+    "enterEvent": "Etkinliğe Gir",
+    "noEvents": "Kayıtlı etkinlik yok",
+    "noEventsSubtext": "Henüz herhangi bir etkinliğe kayıt olmadınız. Beklenmedik bir durum ise etkinlik organizatörünüzle iletişime geçin.",
+    "sessions": "oturum",
+    "location": "Konum"
+  },
+  "event": {
+    "back": "← Geri",
+    "sessions": "Oturumlar",
+    "start": "Başlangıç",
+    "end": "Bitiş",
+    "location": "Konum",
+    "noSessions": "Bu etkinlik için oturum bulunmamaktadır.",
+    "checkIn": "Giriş Yap",
+    "active": "Şu an canlı",
+    "upcoming": "Yaklaşan",
+    "ended": "Tamamlandı",
+    "speaker": "Konuşmacı"
+  },
+  "checkin": {
+    "title": "Giriş Yap",
+    "backToEvent": "← Etkinliğe Dön",
+    "scanQR": "QR Kodu Tara",
+    "scanHint": "Kameranızı oturum QR koduna doğrultun",
+    "requesting": "Kamera izni isteniyor…",
+    "cameraActive": "Kamera aktif — QR kodu sabit tutun",
+    "cameraDenied": "Kamera erişimi reddedildi.",
+    "cameraUnsupported": "Tarayıcınız canlı taramayı desteklemiyor.",
+    "cameraError": "Kamera başlatılamadı.",
+    "allowCamera": "QR tarayıcıyı kullanmak için kamera erişimine izin verin ve sayfayı yenileyin.",
+    "useManual": "Aşağıdaki manuel kod girişini kullanın.",
+    "divider": "veya kodu manuel olarak girin",
+    "codePlaceholder": "Katılım kodu",
+    "codeLabel": "Kodu girin",
+    "submit": "Katılımı Onayla",
+    "submitting": "Gönderiliyor…",
+    "successTitle": "Giriş yapıldı!",
+    "successSubtext": "Katılımınız kaydedildi.",
+    "backAfterSuccess": "Etkinliğe Dön",
+    "error": "Giriş başarısız. Lütfen kodu kontrol edip tekrar deneyin.",
+    "emptyCode": "Lütfen bir katılım kodu girin."
+  },
+  "nav": {
+    "logout": "Çıkış"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "error": "Bir şeyler ters gitti.",
+    "noData": "Veri bulunamadı.",
+    "notFound": "Sayfa bulunamadı."
+  }
+}
