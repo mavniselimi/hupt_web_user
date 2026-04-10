@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { QRCodeSVG } from 'qrcode.react'
 import { eventsService } from '@/features/events/eventsService'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/i18n/useT'
@@ -35,16 +36,52 @@ function ErrorBanner({ message }) {
   )
 }
 
-function EmptyEvents({ t }) {
+function IdentityCard({ user, t }) {
+  // Value encoded in the QR code — matches the format the backend expects for
+  // identity verification: "USER:{userId}". Falls back to a placeholder string
+  // if the user object hasn't loaded yet (should never be visible in practice).
+  const qrValue = user?.id != null ? `USER:${user.id}` : 'USER:unknown'
+
   return (
-    <div className="flex flex-col items-center py-20 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
-        <svg className="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-        </svg>
+    <div className="flex flex-col gap-5">
+      {/* Info banner */}
+      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        {t('home.noEventsSubtext')}
       </div>
-      <p className="text-base font-semibold text-slate-800">{t('home.noEvents')}</p>
-      <p className="mt-2 max-w-xs text-sm text-slate-500">{t('home.noEventsSubtext')}</p>
+
+      {/* Identity QR card */}
+      <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-8 shadow-sm">
+        <p className="mb-5 text-sm font-semibold uppercase tracking-widest text-slate-400">
+          {t('home.yourQR')}
+        </p>
+
+        {/* QR code */}
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-inner">
+          <QRCodeSVG
+            value={qrValue}
+            size={200}
+            level="M"
+            includeMargin={false}
+            fgColor="#1e293b"
+            bgColor="#ffffff"
+          />
+        </div>
+
+        {/* User identity */}
+        <div className="mt-5 flex flex-col items-center gap-1 text-center">
+          {user?.name && (
+            <p className="text-base font-semibold text-slate-900">{user.name}</p>
+          )}
+          {user?.id != null && (
+            <p className="font-mono text-xs text-slate-400">{t('home.qrId', { id: user.id })}</p>
+          )}
+        </div>
+
+        {/* Hint */}
+        <p className="mt-4 max-w-xs text-center text-xs leading-relaxed text-slate-500">
+          {t('home.qrHint')}
+        </p>
+      </div>
     </div>
   )
 }
@@ -176,7 +213,7 @@ export function HomePage() {
       ) : error ? (
         <ErrorBanner message={error} />
       ) : events.length === 0 ? (
-        <EmptyEvents t={t} />
+        <IdentityCard user={user} t={t} />
       ) : events.length === 1 ? (
         /* Single event — prominent hero card */
         <EventCard event={events[0]} prominent t={t} />

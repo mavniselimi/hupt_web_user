@@ -15,6 +15,9 @@
     "enterEvent": "Etkinliğe Gir",
     "noEvents": "Kayıtlı etkinlik yok",
     "noEventsSubtext": "Henüz herhangi bir etkinliğe kayıt olmadınız. Beklenmedik bir durum ise etkinlik organizatörünüzle iletişime geçin.",
+    "yourQR": "Kayıt QR Kodunuz",
+    "qrHint": "Kimliğinizi doğrulamak için bu kodu etkinlik görevlilerine gösterin.",
+    "qrId": "ID: {{id}}",
     "sessions": "oturum",
     "location": "Konum"
   },

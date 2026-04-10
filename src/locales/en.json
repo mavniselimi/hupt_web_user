@@ -15,6 +15,9 @@
     "enterEvent": "Enter Event",
     "noEvents": "No registered events",
     "noEventsSubtext": "You have not been registered for any events yet. Contact your event organiser if this is unexpected.",
+    "yourQR": "Your Registration QR",
+    "qrHint": "Show this code to event staff to verify your identity.",
+    "qrId": "ID: {{id}}",
     "sessions": "sessions",
     "location": "Location"
   },

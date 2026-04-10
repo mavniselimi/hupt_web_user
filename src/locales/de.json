@@ -15,6 +15,9 @@
     "enterEvent": "Zur Veranstaltung",
     "noEvents": "Keine registrierten Veranstaltungen",
     "noEventsSubtext": "Sie sind noch für keine Veranstaltung registriert. Kontaktieren Sie Ihren Veranstaltungsorganisator, falls dies unerwartet ist.",
+    "yourQR": "Ihr Registrierungs-QR",
+    "qrHint": "Zeigen Sie diesen Code dem Veranstaltungspersonal, um Ihre Identität zu bestätigen.",
+    "qrId": "ID: {{id}}",
     "sessions": "Sitzungen",
     "location": "Ort"
   },
