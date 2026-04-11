@@ -261,8 +261,10 @@ export function HomePage() {
         <IdentityCard user={user} t={t} />
       ) :events.length === 1 ? (
         <>
-          <RegistrationStatusCard registration={registration} />
-          <EventCard event={events[0]} prominent t={t} />
+        {registration.status === "PENDING" && (
+          <RegistrationStatusCard registration={registration} /> )}
+           {registration.status === "CARD_ISSUED" && (
+          <EventCard event={events[0]} prominent t={t} /> )}
         </>
       ) : (
         /* Multiple events — card list */

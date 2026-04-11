@@ -1,81 +1,92 @@
 /**
- * QRScanner
+ * QRScanner — cross-browser mobile QR code scanner
  *
- * Mobile-first live QR-code scanner.
+ * Decoding strategy (tiered, auto-selected):
  *
- * Technology:
- *   – getUserMedia       camera stream  (all modern mobile browsers)
- *   – BarcodeDetector    QR decoding    (Chrome 88+, Safari 17+ / iOS 17+)
+ *   Tier 1 — BarcodeDetector API
+ *     Chrome 88+ desktop/Android, Safari 17+ / iOS 17+.
+ *     Works directly on the <video> element; zero CPU copy overhead.
  *
- * Mount the component to start scanning; unmount to release the camera.
- * All four callback props should be memoised with useCallback by the parent
- * so the effect — which lists them as deps — never re-runs unnecessarily.
+ *   Tier 2 — jsqr (pure JS, imported as npm dep)
+ *     All browsers that support getUserMedia: iOS Safari < 17, older Chrome,
+ *     Firefox, Samsung Internet, WebView, etc.
+ *     Draws each frame onto a hidden <canvas> and passes the pixel data to
+ *     jsQR which decodes entirely in JS, no native binding required.
  *
- * Props
- *   onScan(value)      called once when the first QR code is decoded
- *   onNotSupported()   BarcodeDetector unavailable in this browser
+ * Both tiers share the same lifecycle:
+ *   mount → request camera → stream to <video> → poll frames → onScan() → done
+ *
+ * Props (all should be useCallback-memoised by the parent):
+ *   onScan(value)      called once with the decoded QR string
+ *   onNotSupported()   no getUserMedia *and* jsqr failed (very rare)
  *   onDenied()         camera permission denied
  *   onError(err)       other getUserMedia / setup failure
  */
 import { useEffect, useRef, useState } from 'react'
+import jsQR from 'jsqr'
 import { useT } from '@/i18n/useT'
 
-const QR_FORMATS = ['qr_code']
-const POLL_MS = 200
+const POLL_MS = 250   // ms between decode attempts — balance speed vs CPU
 
 export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
   const { t } = useT()
 
-  const videoRef = useRef(null)
+  const videoRef  = useRef(null)
+  const canvasRef = useRef(null)   // hidden canvas for jsQR pixel capture
   const streamRef = useRef(null)
-  const aliveRef = useRef(false)
-  const timerId = useRef(null)
+  const aliveRef  = useRef(false)
+  const timerId   = useRef(null)
 
-  // Starts as 'requesting' because scanning begins immediately on mount.
+  // 'requesting' | 'scanning' | 'done'
+  // Starts as 'requesting' because camera acquisition begins immediately.
   // All subsequent setScanStatus() calls happen inside the async `run()`
-  // function, always after at least one `await`, so they are never
-  // synchronous from the effect's top-level execution perspective.
+  // function, always after at least one `await`, satisfying the strict
+  // eslint-plugin-react-hooks v7 `set-state-in-effect` rule.
   const [scanStatus, setScanStatus] = useState('requesting')
 
   useEffect(() => {
     aliveRef.current = true
+    const videoEl = videoRef.current   // captured for cleanup
 
-    // Capture for cleanup to satisfy the exhaustive-deps rule about
-    // ref.current values potentially changing before cleanup runs.
-    const videoEl = videoRef.current
-
-    // Entire scanning pipeline is defined as a local async function so that
-    // the linter's set-state-in-effect rule does not flag it — all setState
-    // calls occur after `await` statements, never synchronously.
     async function run() {
-      // ── 1. BarcodeDetector support ──────────────────────
-      if (!('BarcodeDetector' in window)) {
+      // ── Tier selection ──────────────────────────────────────────
+      // Try to create a native BarcodeDetector first. If unavailable
+      // or throws, we rely entirely on jsQR (always available since it
+      // is a bundled npm dependency, not a runtime CDN load).
+      let detector = null
+      if ('BarcodeDetector' in window) {
+        try {
+          detector = new window.BarcodeDetector({ formats: ['qr_code'] })
+        } catch {
+          detector = null
+        }
+      }
+      // jsQR is always importable; detector === null means we use it.
+
+      // ── Camera access ───────────────────────────────────────────
+      if (!navigator.mediaDevices?.getUserMedia) {
+        // Extremely old browser or non-secure context (HTTP).
+        // jsQR can decode but we have no way to get frames.
         onNotSupported?.()
         return
       }
 
-      let detector
-      try {
-        detector = new window.BarcodeDetector({ formats: QR_FORMATS })
-      } catch {
-        onNotSupported?.()
-        return
-      }
-
-      // ── 2. Camera access ────────────────────────────────
       let stream
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+            facingMode: { ideal: 'environment' },   // rear camera on mobile
+            width:  { ideal: 1280 },
+            height: { ideal: 720  },
           },
           audio: false,
         })
       } catch (err) {
         if (!aliveRef.current) return
-        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        if (
+          err.name === 'NotAllowedError' ||
+          err.name === 'PermissionDeniedError'
+        ) {
           onDenied?.()
         } else {
           onError?.(err)
@@ -90,41 +101,80 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
 
       streamRef.current = stream
 
-      // ── 3. Attach stream to <video> ──────────────────────
+      // ── Attach stream to <video> ────────────────────────────────
       const video = videoRef.current
       if (!video) return
 
-      video.srcObject = stream
-      video.muted = true       // required for iOS Safari autoplay
-      video.playsInline = true // required to play inline on iOS
+      video.srcObject   = stream
+      video.muted       = true          // required for iOS Safari autoplay policy
+      video.playsInline = true          // required for inline playback on iOS
 
       try {
         await video.play()
       } catch {
-        // Non-fatal — BarcodeDetector still works on video frames
+        // Non-fatal — tick() guards on readyState
       }
 
       if (!aliveRef.current) return
 
-      // Safe: this setState call is after an `await`, not synchronous
+      // Safe to setState: we are past at least one `await`.
       setScanStatus('scanning')
 
-      // ── 4. Polling detection loop ────────────────────────
+      // ── Polling decode loop ─────────────────────────────────────
+      // Canvas is only used by the jsQR path; BarcodeDetector receives
+      // the video element directly. We create the 2d context once with
+      // `willReadFrequently` so the browser can optimise pixel readbacks.
+      const canvas = canvasRef.current
+      const ctx    = canvas
+        ? canvas.getContext('2d', { willReadFrequently: true })
+        : null
+
       async function tick() {
         if (!aliveRef.current) return
+
         const v = videoRef.current
-        if (v && v.readyState >= 2 /* HAVE_CURRENT_DATA */) {
-          try {
+        // Wait until at least one frame is available (readyState ≥ 2)
+        if (!v || v.readyState < 2) {
+          timerId.current = setTimeout(tick, POLL_MS)
+          return
+        }
+
+        try {
+          if (detector) {
+            // ── Tier 1: BarcodeDetector ─────────────────────────
             const codes = await detector.detect(v)
             if (codes.length > 0 && aliveRef.current) {
               setScanStatus('done')
               onScan?.(codes[0].rawValue)
               return
             }
-          } catch {
-            // ignore per-frame decode errors (e.g. blurry frames)
+          } else if (ctx && canvas) {
+            // ── Tier 2: jsQR canvas decode ──────────────────────
+            const w = v.videoWidth  || 640
+            const h = v.videoHeight || 480
+            canvas.width  = w
+            canvas.height = h
+            ctx.drawImage(v, 0, 0, w, h)
+
+            const imageData = ctx.getImageData(0, 0, w, h)
+            // inversionAttempts: 'dontInvert' is fastest and correct for
+            // standard dark-on-light QR codes shown on screens / paper.
+            const result = jsQR(
+              imageData.data,
+              imageData.width,
+              imageData.height,
+              { inversionAttempts: 'dontInvert' },
+            )
+            if (result && aliveRef.current) {
+              setScanStatus('done')
+              onScan?.(result.data)
+              return
+            }
           }
+        } catch {
+          // Ignore per-frame errors: blurry / partial frames are normal
         }
+
         if (aliveRef.current) {
           timerId.current = setTimeout(tick, POLL_MS)
         }
@@ -146,7 +196,7 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
     }
   }, [onScan, onNotSupported, onDenied, onError])
 
-  /* ── Render ───────────────────────────────────────────── */
+  /* ── Render ─────────────────────────────────────────────────── */
 
   return (
     <div
@@ -162,12 +212,28 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
         className="absolute inset-0 h-full w-full object-cover"
       />
 
+      {/* Hidden canvas — only used by the jsQR decode path */}
+      <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
+
       {/* Requesting overlay */}
       {scanStatus === 'requesting' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-white">
-          <svg className="mb-3 h-7 w-7 animate-spin opacity-70" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          <svg
+            className="mb-3 h-7 w-7 animate-spin opacity-70"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              className="opacity-25"
+              cx="12" cy="12" r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
           </svg>
           <p className="text-sm">{t('checkin.requesting')}</p>
         </div>
@@ -178,10 +244,12 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
         <>
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="relative h-48 w-48">
-              <span className="absolute left-0 top-0 block h-8 w-8 rounded-tl border-l-2 border-t-2 border-white" />
-              <span className="absolute right-0 top-0 block h-8 w-8 rounded-tr border-r-2 border-t-2 border-white" />
-              <span className="absolute bottom-0 left-0 block h-8 w-8 rounded-bl border-b-2 border-l-2 border-white" />
+              {/* Corners */}
+              <span className="absolute left-0  top-0    block h-8 w-8 rounded-tl border-l-2 border-t-2 border-white" />
+              <span className="absolute right-0 top-0    block h-8 w-8 rounded-tr border-r-2 border-t-2 border-white" />
+              <span className="absolute bottom-0 left-0  block h-8 w-8 rounded-bl border-b-2 border-l-2 border-white" />
               <span className="absolute bottom-0 right-0 block h-8 w-8 rounded-br border-b-2 border-r-2 border-white" />
+              {/* Animated scan line */}
               <div className="animate-scan-line absolute left-0 right-0 h-0.5 bg-indigo-400/80 blur-[1px]" />
             </div>
           </div>
@@ -203,7 +271,11 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
             stroke="currentColor"
             strokeWidth={2}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 12.75l6 6 9-13.5"
+            />
           </svg>
         </div>
       )}
