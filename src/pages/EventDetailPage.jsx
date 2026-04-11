@@ -182,8 +182,10 @@ export function EventDetailPage() {
                         <p className="mt-1.5 text-xs text-slate-400">{formatDateTime(session.startTime)}</p>
                       )}
                     </div>
-
-                    {/* Check-in button */}
+                      
+                      
+                    {console.log(session)}
+                    { session.attendanceEnabled === true && (
                     <Link
                       to={`/event/${eventId}/session/${session.id}/check-in`}
                       state={{ sessionTitle: session.title }}
@@ -194,6 +196,7 @@ export function EventDetailPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </Link>
+                    )}
                   </div>
                 </li>
               )
