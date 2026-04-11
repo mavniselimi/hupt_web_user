@@ -35,8 +35,12 @@ export function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white to-slate-50 p-5">
       {/* Logo mark */}
       <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200">
-          <span className="text-2xl font-bold text-white">H</span>
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 overflow-hidden">
+          <img
+            src="/logo.png"
+            alt="HUPT logo"
+            className="h-full w-full object-cover"
+          />
         </div>
         <span className="text-lg font-semibold tracking-tight text-slate-900">HUPT</span>
       </div>
@@ -63,7 +67,7 @@ export function LoginPage() {
                 required
                 value={form.email}
                 onChange={onChange}
-                placeholder="you@example.com"
+                placeholder="Mailiniz"
                 className="min-h-[48px] w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
@@ -80,7 +84,7 @@ export function LoginPage() {
                 required
                 value={form.password}
                 onChange={onChange}
-                placeholder="••••••••"
+                placeholder="Telefon numaranızın son 4 hanesi"
                 className="min-h-[48px] w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
