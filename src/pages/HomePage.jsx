@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { eventsService } from '@/features/events/eventsService'
+import { registrationsService } from '@/features/registration/registrationsService'
 import { useAuthStore } from '@/store/authStore'
 import { useT } from '@/i18n/useT'
 import { formatDateTime } from '@/utils/formatters'
@@ -72,9 +73,10 @@ function IdentityCard({ user, t }) {
           {user?.name && (
             <p className="text-base font-semibold text-slate-900">{user.name}</p>
           )}
+          {/**
           {user?.id != null && (
             <p className="font-mono text-xs text-slate-400">{t('home.qrId', { id: user.id })}</p>
-          )}
+          )} */}
         </div>
 
         {/* Hint */}
@@ -168,6 +170,35 @@ function EventCard({ event, prominent = false, t }) {
   )
 }
 
+function RegistrationStatusCard({ registration }) {
+  if (!registration) return null
+
+  return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+      <p className="text-sm font-semibold text-amber-900">
+        Status: {registration.status}
+      </p>
+
+      {registration.status === 'PENDING' && (
+        <>
+          <p className="mt-2 text-sm text-amber-800">
+            Please go to: {registration.assignedRegistrarName}
+          </p>
+          <p className="text-sm text-amber-800">
+            Queue number: {registration.queueNumber}
+          </p>
+        </>
+      )}
+
+      {registration.status === 'CARD_ISSUED' && registration.processedByName && (
+        <p className="mt-2 text-sm text-amber-800">
+          Processed by: {registration.processedByName}
+        </p>
+      )}
+    </div>
+  )
+}
+
 /* ─── Page ────────────────────────────────────────────────── */
 
 export function HomePage() {
@@ -177,6 +208,7 @@ export function HomePage() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [registration, setRegistration] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -184,6 +216,11 @@ export function HomePage() {
       try {
         const data = await eventsService.myRegistered()
         setEvents(data)
+        if (data.length === 1) {
+          const reg = await registrationsService.myForEvent(data[0].id)
+          setRegistration(reg)
+        }
+
       } catch {
         setError(t('common.error'))
       } finally {
@@ -214,9 +251,11 @@ export function HomePage() {
         <ErrorBanner message={error} />
       ) : events.length === 0 ? (
         <IdentityCard user={user} t={t} />
-      ) : events.length === 1 ? (
-        /* Single event — prominent hero card */
-        <EventCard event={events[0]} prominent t={t} />
+      ) :events.length === 1 ? (
+        <>
+          <RegistrationStatusCard registration={registration} />
+          <EventCard event={events[0]} prominent t={t} />
+        </>
       ) : (
         /* Multiple events — card list */
         <div className="flex flex-col gap-3">
