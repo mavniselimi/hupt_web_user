@@ -211,8 +211,10 @@ export function HomePage() {
   const [registration, setRegistration] = useState(null)
 
   useEffect(() => {
-    async function load() {
-      setLoading(true)
+    let intervalId
+
+    async function load(initial = false) {
+      if (initial) setLoading(true)
       try {
         const data = await eventsService.myRegistered()
         console.log(data)
@@ -223,14 +225,17 @@ export function HomePage() {
           setRegistration(reg)
 
         }
-
+        setError('')
       } catch {
         setError(t('common.error'))
       } finally {
         setLoading(false)
       }
     }
-    load()
+    load(true)
+    intervalId = setInterval(() => load(false), 4000)
+
+    return () => clearInterval(intervalId)
   }, [t])
 
   const firstName = user?.name?.split(' ')[0] || user?.name
