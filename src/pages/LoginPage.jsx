@@ -42,7 +42,7 @@ export function LoginPage() {
             className="h-full w-full object-cover"
           />
         </div>
-        <span className="text-lg font-semibold tracking-tight text-slate-900">HUPT</span>
+        <span className="text-lg font-semibold tracking-tight text-slate-900">HÜPT</span>
       </div>
 
       {/* Card */}
