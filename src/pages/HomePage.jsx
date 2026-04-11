@@ -218,7 +218,9 @@ export function HomePage() {
         setEvents(data)
         if (data.length === 1) {
           const reg = await registrationsService.myForEvent(data[0].id)
+          console.log(reg)
           setRegistration(reg)
+
         }
 
       } catch {
