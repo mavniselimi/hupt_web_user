@@ -91,7 +91,7 @@ function IdentityCard({ user, t }) {
 function EventCard({ event, prominent = false, t }) {
   return (
     <Link
-      to={`/event/${event.id}`}
+      to={`/event/${event.eventId}`}
       className={`block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md active:scale-[0.99] ${
         prominent ? 'sm:p-6' : ''
       }`}
@@ -103,7 +103,7 @@ function EventCard({ event, prominent = false, t }) {
             prominent ? 'text-xl' : 'text-base'
           }`}
         >
-          {event.title}
+          {event.eventTitle}
         </h2>
         {/* Arrow */}
         <svg
@@ -263,7 +263,7 @@ export function HomePage() {
         /* Multiple events — card list */
         <div className="flex flex-col gap-3">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} t={t} />
+            <EventCard key={event.eventId} event={event} t={t} />
           ))}
         </div>
       )}
