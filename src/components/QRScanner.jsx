@@ -17,16 +17,36 @@
  *   mount → request camera → stream to <video> → poll frames → onScan() → done
  *
  * Props (all should be useCallback-memoised by the parent):
- *   onScan(value)      called once with the decoded QR string
- *   onNotSupported()   no getUserMedia *and* jsqr failed (very rare)
- *   onDenied()         camera permission denied
- *   onError(err)       other getUserMedia / setup failure
+ *   onScan(value)           called once with the decoded QR string
+ *   onNotSupported()        no getUserMedia *and* jsqr failed (very rare)
+ *   onDenied(permState)     camera permission denied; permState is one of
+ *                           'denied' | 'prompt' | 'unknown'
+ *                           'denied'  → browser site settings are blocking
+ *                           'prompt'  → user dismissed without choosing
+ *                           'unknown' → Permissions API not available
+ *   onError(err)            other getUserMedia / setup failure
  */
 import { useEffect, useRef, useState } from 'react'
 import jsQR from 'jsqr'
 import { useT } from '@/i18n/useT'
 
 const POLL_MS = 250   // ms between decode attempts — balance speed vs CPU
+
+/**
+ * Query the Permissions API for the camera permission state.
+ * Returns 'denied' | 'prompt' | 'granted' | 'unknown'.
+ * Wrapped in try/catch because:
+ *   – Safari < 16 does not support navigator.permissions at all
+ *   – Some browsers support the API but not the 'camera' descriptor
+ */
+async function queryCameraPermission() {
+  try {
+    const status = await navigator.permissions.query({ name: 'camera' })
+    return status.state   // 'granted' | 'denied' | 'prompt'
+  } catch {
+    return 'unknown'
+  }
+}
 
 export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
   const { t } = useT()
@@ -83,11 +103,22 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
         })
       } catch (err) {
         if (!aliveRef.current) return
+
+        // Always log the raw error so it shows up in browser DevTools,
+        // making it much easier to distinguish permission issues from
+        // device/stream errors without needing to reproduce on a server.
+        console.error('[QRScanner] getUserMedia failed —', err.name, ':', err.message)
+
         if (
           err.name === 'NotAllowedError' ||
           err.name === 'PermissionDeniedError'
         ) {
-          onDenied?.()
+          // Query the Permissions API to learn whether the site is hard-blocked
+          // ('denied') or the user merely dismissed the prompt ('prompt').
+          // This lets the UI show a more specific recovery instruction.
+          const permState = await queryCameraPermission()
+          console.info('[QRScanner] navigator.permissions camera state:', permState)
+          onDenied?.(permState)
         } else {
           onError?.(err)
         }

@@ -34,6 +34,10 @@ export function CheckInPage() {
   // ── Scanner state ────────────────────────────────────────────
   const [scannerAvailable, setScannerAvailable] = useState(true)
   const [cameraDenied, setCameraDenied] = useState(false)
+  // 'denied'  → browser site settings hard-block the camera
+  // 'prompt'  → user dismissed the permission prompt without choosing
+  // 'unknown' → Permissions API unavailable; cause uncertain
+  const [cameraPermState, setCameraPermState] = useState(null)
   const [cameraError, setCameraError] = useState(false)
   const scannedRef = useRef(false) // prevent double-submit from rapid bursts
 
@@ -75,9 +79,15 @@ export function CheckInPage() {
     [submit],
   )
 
-  // Stable scanner error callbacks — same reasoning as above
+  // Stable scanner error callbacks — same reasoning as above.
+  // handleDenied receives the permState string from QRScanner so the UI
+  // can show a specific recovery instruction ('denied' = open site settings;
+  // 'prompt' = just refresh and tap Allow; 'unknown' = generic guidance).
   const handleNotSupported = useCallback(() => setScannerAvailable(false), [])
-  const handleDenied = useCallback(() => setCameraDenied(true), [])
+  const handleDenied = useCallback((permState) => {
+    setCameraDenied(true)
+    setCameraPermState(permState ?? 'unknown')
+  }, [])
   const handleCameraError = useCallback(() => setCameraError(true), [])
 
   // ── Manual form submit ───────────────────────────────────────
@@ -165,7 +175,16 @@ export function CheckInPage() {
           <CameraNotice
             icon="🚫"
             message={t('checkin.cameraDenied')}
-            sub={t('checkin.allowCamera')}
+            sub={
+              // 'denied'  → browser has persistently blocked the camera for
+              //             this origin; the user must change site settings.
+              // 'prompt' / 'unknown' → the prompt was dismissed or the
+              //             Permissions API isn't available; a refresh is
+              //             often enough.
+              cameraPermState === 'denied'
+                ? t('checkin.cameraPermBlocked')
+                : t('checkin.allowCamera')
+            }
           />
         )}
         {cameraError && !cameraDenied && (
