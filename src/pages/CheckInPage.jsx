@@ -243,7 +243,7 @@ export function CheckInPage() {
 
         {/* ── Temporary debug panel ──────────────────────────
             Shows the raw getUserMedia error on-screen for mobile debugging.
-            Remove this block (and cameraDebug state) once resolved. */}
+            Remove this block (and cameraDebug state) once resolved. 
         {cameraDebug && (
           <div className="w-full max-w-sm rounded-lg border border-red-200 bg-red-50 p-3">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">
@@ -252,6 +252,7 @@ export function CheckInPage() {
             <p className="break-all font-mono text-xs text-red-700">{cameraDebug}</p>
           </div>
         )}
+        */}
       </div>
 
       {/* ── Divider ─────────────────────────────────────────── */}

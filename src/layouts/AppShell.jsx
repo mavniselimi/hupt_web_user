@@ -19,10 +19,17 @@ export function AppShell() {
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
           {/* Brand */}
           <div className="flex items-center gap-2 select-none">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white">
+            {/*<span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white">
               H
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-slate-900">HUPT</span>
+            </span>*/}
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 shadow-lg shadow-indigo-200 overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="HUPT logo"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <span className="text-sm font-semibold tracking-tight text-slate-900">HÜPT</span>
           </div>
 
           {/* Right: name + logout */}
