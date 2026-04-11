@@ -39,6 +39,8 @@
     "backToEvent": "← Etkinliğe Dön",
     "scanQR": "QR Kodu Tara",
     "scanHint": "Kameranızı oturum QR koduna doğrultun",
+    "openCamera": "Kamerayı Aç",
+    "openCameraHint": "QR tarayıcıyı başlatmak için dokunun",
     "requesting": "Kamera izni isteniyor…",
     "cameraActive": "Kamera aktif — QR kodu sabit tutun",
     "cameraDenied": "Kamera erişimi sağlanamadı.",

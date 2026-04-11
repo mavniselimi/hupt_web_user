@@ -39,6 +39,8 @@
     "backToEvent": "← Zurück zur Veranstaltung",
     "scanQR": "QR-Code scannen",
     "scanHint": "Richten Sie Ihre Kamera auf den QR-Code der Sitzung",
+    "openCamera": "Kamera öffnen",
+    "openCameraHint": "Tippen, um den QR-Scanner zu starten",
     "requesting": "Kamerazugriff wird angefordert…",
     "cameraActive": "Kamera aktiv — halten Sie den QR-Code still",
     "cameraDenied": "Kamerazugriff konnte nicht erhalten werden.",

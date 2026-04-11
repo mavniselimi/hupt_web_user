@@ -32,6 +32,10 @@ export function CheckInPage() {
   const [submitError, setSubmitError] = useState('')
 
   // ── Scanner state ────────────────────────────────────────────
+  // cameraActivated starts false so QRScanner is NOT mounted on page load.
+  // getUserMedia() is only called after the user taps "Open Camera", which
+  // satisfies the user-gesture requirement on mobile Chrome / Safari.
+  const [cameraActivated, setCameraActivated] = useState(false)
   const [scannerAvailable, setScannerAvailable] = useState(true)
   const [cameraDenied, setCameraDenied] = useState(false)
   // 'denied'  → browser site settings hard-block the camera
@@ -138,7 +142,11 @@ export function CheckInPage() {
   }
 
   /* ── Form screen ──────────────────────────────────────────── */
-  const showScanner = scannerAvailable && !cameraDenied && !cameraError
+  // QRScanner is only mounted when the user has explicitly tapped "Open Camera"
+  // AND no error state has been set. The user-gesture gate is what makes
+  // getUserMedia() succeed reliably on mobile Chrome.
+  const scannerReady = scannerAvailable && !cameraDenied && !cameraError
+  const showScanner  = scannerReady && cameraActivated && !submitting
 
   return (
     <div className="flex flex-col gap-5">
@@ -156,14 +164,48 @@ export function CheckInPage() {
         {sessionTitle && <p className="mt-0.5 text-sm text-slate-500">{sessionTitle}</p>}
       </div>
 
-      {/* ── QR scanner ──────────────────────────────────────── */}
+      {/* ── QR scanner section ──────────────────────────────── */}
       <div className="flex flex-col items-center gap-3">
         <p className="self-start text-sm font-medium text-slate-700">{t('checkin.scanQR')}</p>
-        <p className="self-start text-xs text-slate-400">{t('checkin.scanHint')}</p>
 
-        {/* QRScanner is conditionally rendered — unmounting stops the camera.
-            We hide it while submitting to prevent a second scan mid-flight. */}
-        {showScanner && !submitting && (
+        {/* Pre-activation: show the "Open Camera" button.
+            The button tap is the user gesture required by mobile Chrome
+            before getUserMedia() is allowed to run. */}
+        {scannerReady && !cameraActivated && (
+          <button
+            type="button"
+            onClick={() => setCameraActivated(true)}
+            className="flex w-full max-w-sm items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-indigo-300 bg-indigo-50 px-6 py-10 text-indigo-700 transition-colors hover:border-indigo-400 hover:bg-indigo-100 active:bg-indigo-200"
+          >
+            {/* Camera icon */}
+            <svg
+              className="h-7 w-7 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
+              />
+            </svg>
+            <span className="flex flex-col items-start gap-0.5 text-left">
+              <span className="text-base font-semibold">{t('checkin.openCamera')}</span>
+              <span className="text-xs font-normal text-indigo-500">{t('checkin.openCameraHint')}</span>
+            </span>
+          </button>
+        )}
+
+        {/* Active scanner — only mounted after user taps the button above.
+            Unmounting on submit prevents a second scan mid-flight. */}
+        {showScanner && (
           <QRScanner
             onScan={handleScan}
             onNotSupported={handleNotSupported}
@@ -172,6 +214,7 @@ export function CheckInPage() {
           />
         )}
 
+        {/* ── Error / unsupported notices ──────────────────── */}
         {!scannerAvailable && (
           <CameraNotice
             icon="🔍"
@@ -184,11 +227,6 @@ export function CheckInPage() {
             icon="🚫"
             message={t('checkin.cameraDenied')}
             sub={
-              // 'denied'  → browser has persistently blocked the camera for
-              //             this origin; the user must change site settings.
-              // 'prompt' / 'unknown' → the prompt was dismissed or the
-              //             Permissions API isn't available; a refresh is
-              //             often enough.
               cameraPermState === 'denied'
                 ? t('checkin.cameraPermBlocked')
                 : t('checkin.allowCamera')
@@ -204,9 +242,7 @@ export function CheckInPage() {
         )}
 
         {/* ── Temporary debug panel ──────────────────────────
-            Shows the raw getUserMedia error name + message on-screen.
-            Mobile browsers have no easy DevTools access, so this is the
-            only reliable way to read the exact error during field testing.
+            Shows the raw getUserMedia error on-screen for mobile debugging.
             Remove this block (and cameraDebug state) once resolved. */}
         {cameraDebug && (
           <div className="w-full max-w-sm rounded-lg border border-red-200 bg-red-50 p-3">
