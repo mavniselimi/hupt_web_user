@@ -63,6 +63,12 @@
   "nav": {
     "logout": "Abmelden"
   },
+  "registration": {
+    "status": "Status",
+    "pleaseGoTo": "Bitte gehen Sie zu: {{name}}",
+    "queueNumber": "Warteschlangennummer: {{number}}",
+    "processedBy": "Bearbeitet von: {{name}}"
+  },
   "common": {
     "loading": "Wird geladen…",
     "error": "Etwas ist schiefgelaufen.",

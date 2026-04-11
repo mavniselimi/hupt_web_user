@@ -171,28 +171,29 @@ function EventCard({ event, prominent = false, t }) {
 }
 
 function RegistrationStatusCard({ registration }) {
+  const { t } = useT()
   if (!registration) return null
 
   return (
     <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
       <p className="text-sm font-semibold text-amber-900">
-        Status: {registration.status}
+        {t('registration.status')}: {registration.status}
       </p>
 
       {registration.status === 'PENDING' && (
         <>
           <p className="mt-2 text-sm text-amber-800">
-            Please go to: {registration.assignedRegistrarName}
+            {t('registration.pleaseGoTo', { name: registration.assignedRegistrarName })}
           </p>
           <p className="text-sm text-amber-800">
-            Queue number: {registration.queueNumber}
+            {t('registration.queueNumber', { number: registration.queueNumber })}
           </p>
         </>
       )}
 
       {registration.status === 'CARD_ISSUED' && registration.processedByName && (
         <p className="mt-2 text-sm text-amber-800">
-          Processed by: {registration.processedByName}
+          {t('registration.processedBy', { name: registration.processedByName })}
         </p>
       )}
     </div>

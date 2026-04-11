@@ -63,6 +63,12 @@
   "nav": {
     "logout": "Logout"
   },
+  "registration": {
+    "status": "Status",
+    "pleaseGoTo": "Please go to: {{name}}",
+    "queueNumber": "Queue number: {{number}}",
+    "processedBy": "Processed by: {{name}}"
+  },
   "common": {
     "loading": "Loading…",
     "error": "Something went wrong.",

@@ -63,6 +63,12 @@
   "nav": {
     "logout": "Çıkış"
   },
+  "registration": {
+    "status": "Durum",
+    "pleaseGoTo": "Lütfen gidin: {{name}}",
+    "queueNumber": "Sıra numarası: {{number}}",
+    "processedBy": "İşlemi yapan: {{name}}"
+  },
   "common": {
     "loading": "Yükleniyor…",
     "error": "Bir şeyler ters gitti.",
