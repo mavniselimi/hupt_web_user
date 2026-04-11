@@ -119,9 +119,11 @@ export function QRScanner({ onScan, onNotSupported, onDenied, onError }) {
           const permState = await queryCameraPermission()
           console.info('[QRScanner] navigator.permissions camera state:', permState)
           onDenied?.(permState)
-        } else {
-          onError?.(err)
         }
+        // Always fire onError(err) for every getUserMedia failure so the
+        // parent can surface the raw error.name / message in the debug UI,
+        // even when the primary callback is onDenied.
+        onError?.(err)
         return
       }
 

@@ -39,6 +39,10 @@ export function CheckInPage() {
   // 'unknown' → Permissions API unavailable; cause uncertain
   const [cameraPermState, setCameraPermState] = useState(null)
   const [cameraError, setCameraError] = useState(false)
+  // Temporary debug state — captures the raw getUserMedia error name+message
+  // so it is visible directly on screen (mobile has no easy DevTools access).
+  // Remove this state and its references once the camera issue is resolved.
+  const [cameraDebug, setCameraDebug] = useState(null)
   const scannedRef = useRef(false) // prevent double-submit from rapid bursts
 
   // ── Core submit ──────────────────────────────────────────────
@@ -88,7 +92,11 @@ export function CheckInPage() {
     setCameraDenied(true)
     setCameraPermState(permState ?? 'unknown')
   }, [])
-  const handleCameraError = useCallback(() => setCameraError(true), [])
+  const handleCameraError = useCallback((err) => {
+    setCameraError(true)
+    // Capture the raw error string for the on-screen debug panel.
+    if (err) setCameraDebug(`${err.name}: ${err.message}`)
+  }, [])
 
   // ── Manual form submit ───────────────────────────────────────
   const handleManualSubmit = useCallback(
@@ -193,6 +201,20 @@ export function CheckInPage() {
             message={t('checkin.cameraError')}
             sub={t('checkin.useManual')}
           />
+        )}
+
+        {/* ── Temporary debug panel ──────────────────────────
+            Shows the raw getUserMedia error name + message on-screen.
+            Mobile browsers have no easy DevTools access, so this is the
+            only reliable way to read the exact error during field testing.
+            Remove this block (and cameraDebug state) once resolved. */}
+        {cameraDebug && (
+          <div className="w-full max-w-sm rounded-lg border border-red-200 bg-red-50 p-3">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-red-500">
+              Debug — camera error
+            </p>
+            <p className="break-all font-mono text-xs text-red-700">{cameraDebug}</p>
+          </div>
         )}
       </div>
 
