@@ -215,6 +215,7 @@ export function HomePage() {
       setLoading(true)
       try {
         const data = await eventsService.myRegistered()
+        console.log(data)
         setEvents(data)
         if (data.length === 1) {
           const reg = await registrationsService.myForEvent(data[0].eventId)
